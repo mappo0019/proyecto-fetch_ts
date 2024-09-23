@@ -1,0 +1,11 @@
+.poster-mini{
+    height: 350px;
+    width: 225px;
+}
+
+.poster-boton{
+    height: 355px;
+    width: 235px;
+    margin-top: 20px;
+    cursor:pointer;
+}

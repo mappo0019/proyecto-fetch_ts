@@ -1,0 +1,18 @@
+input {
+    margin: 2px;
+    height: 40px;
+    width: 400px;
+    border-radius: 10px;
+}
+
+input:hover {
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.94);
+}
+
+button{
+    height: 40px;
+    width: 60px;
+    border-radius: 10px;
+    background-color: #29dacb;
+    font-size: 14px;
+}
