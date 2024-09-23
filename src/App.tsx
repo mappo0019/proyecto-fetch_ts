@@ -1,27 +1,40 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import './App.css';
 import Buscador from './componentes/Buscador.tsx';
 import Ficha from './componentes/Ficha.tsx';
 import Miniatura from './componentes/Miniatura.tsx';
 
-
+interface Pelicula{
+  pelicula:{
+    Title: string,
+    Year: string,
+    imdbID: string,
+    Type: string, 
+    Poster: string
+  }, 
+  elegida: boolean,
+  key: number
+}
 function App() {
 
   const[pelis, setPelis] = useState(Array(0));
   const[fav, setFav] = useState(Array(0));
-  const[ident, setIdent] = useState(0);
+  const [identPeli, setIdentPeli] = useState(0);
+  const[identFav, setIdentFav] = useState(0);
+  const [busca, setBusca] = useState(false);
 
-
-  async function clickHandler(){
-    setPelis(Array(0));
+  useEffect(()=>{
+    setPelis([]);
     let barra = document.querySelector(".barra-busqueda") as HTMLInputElement;
     let text = barra.value;
-    let promise = await fetch(`https://www.omdbapi.com/?s=${text}&apikey=3af5df7b`);
-    let response = await promise.json();
-    let result = await response.Search;
-    if(result !== undefined)
-      result.map(res=>{
-        setPelis(pelis=> [...pelis, {pelicula:res, elegida: false}]);
+    fetch(`https://www.omdbapi.com/?s=${text}&apikey=3af5df7b`)
+    .then(response =>  response.json())
+    .then(result => result.Search)
+    .then(movie => {
+    if(movie !== undefined)
+      movie.map((res:Pelicula)=>{
+        setPelis(pelis=> [...pelis, {pelicula:res, elegida: false, key: identPeli }]);
+        setIdentPeli(identPeli => identPeli+1);
       });
     else
       setPelis(Array(0));
@@ -37,13 +50,13 @@ function App() {
       document.body.style.background = "linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(186,215,195,1) 35%, rgba(0,212,255,1) 100%)";
       let titulo = document.querySelector(".app-titulo") as HTMLElement;
       titulo.style.color = "#0a4f58";
-    }
-    
-  }
+    }})
+    setBusca(false);
+  }, [busca])
 
-  function addPeli(peli){
-    setFav([...fav, {pelicula : peli.pelicula, key: ident}]);
-    setIdent(ident=> ident+1);
+  function addPeli(peli : Pelicula){
+    setFav([...fav, {pelicula : peli.pelicula, key: identFav}]);
+    setIdentFav(identFav=> identFav+1);
     let pelis2 = pelis;
     setPelis(pelis2.map(p=>{
       if(p.pelicula === peli.pelicula)
@@ -52,7 +65,7 @@ function App() {
     setPelis(pelis2);
   }
 
-  function deleteMovie(peli){
+  function deleteMovie(peli: Pelicula){
     let pelis2 = pelis;
     setPelis(pelis2.map(p=>{
       if(p.pelicula === peli.pelicula)
@@ -69,7 +82,7 @@ function App() {
       <h1 className = "app-titulo">¡ K n o w <br/> y o u r <br/>m o v i e ! </h1>
       <div className = "pantalla">
         <div>
-          <Buscador onClickAlto = {clickHandler}/>
+          <Buscador onClickAlto = {()=> setBusca(true)}/>
             <div className = "parrilla">
               {pelis.length>0 ? 
               pelis.map((peli)=>{
